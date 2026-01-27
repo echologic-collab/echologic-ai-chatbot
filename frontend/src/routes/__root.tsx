@@ -1,14 +1,13 @@
+import { TanStackDevtools } from '@tanstack/react-devtools'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import { AuthProvider } from '../context/AuthContext'
 
 import Header from '../components/Header'
+import { NotFound } from '../components/NotFound'
 
-import AiDevtools from '../lib/ai-devtools'
+import appCss from '../index.css?url'
 
-import StoreDevtools from '../lib/demo-store-devtools'
-
-import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -33,6 +32,7 @@ export const Route = createRootRoute({
   }),
 
   shellComponent: RootDocument,
+  notFoundComponent: NotFound,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -42,27 +42,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
-        {children}
-        {import.meta.env.DEV && (
-          <>
-            <TanStackDevtools
-              config={{
-                position: 'bottom-right',
-              }}
-              plugins={[
-                {
-                  name: 'Tanstack Router',
-                  render: <TanStackRouterDevtoolsPanel />,
-                },
-                AiDevtools,
-                StoreDevtools,
-              ]}
-            />
-            <Scripts />
-          </>
-        )}
-        {!import.meta.env.DEV && <Scripts />}
+        <AuthProvider>
+          <Header />
+          {children}
+          {import.meta.env.DEV && (
+            <>
+              <TanStackDevtools
+                config={{
+                  position: 'bottom-right',
+                }}
+                plugins={[
+                  {
+                    name: 'Tanstack Router',
+                    render: <TanStackRouterDevtoolsPanel />,
+                  },
+                ]}
+              />
+              <Scripts />
+            </>
+          )}
+          {!import.meta.env.DEV && <Scripts />}
+        </AuthProvider>
       </body>
     </html>
   )
