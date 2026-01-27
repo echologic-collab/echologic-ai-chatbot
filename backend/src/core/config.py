@@ -60,6 +60,10 @@ class Config(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # Neon Auth
+    JWKS_URL: str
+    AUTH_AUDIENCE: Optional[str] = None
+
     # find query
     PAGE: int = 1
     PAGE_SIZE: int = 10
