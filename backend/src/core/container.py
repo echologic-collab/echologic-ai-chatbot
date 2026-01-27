@@ -11,6 +11,7 @@ class Container(containers.DeclarativeContainer):
         modules=[
             "src.api.v1.endpoints.users",
             "src.api.v1.endpoints.auth",
+            "src.api.v1.endpoints.chat",
         ]
     )
 
