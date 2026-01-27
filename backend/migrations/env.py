@@ -19,9 +19,16 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# migrations/env.py
+from sqlmodel import SQLModel
+# FORCED MANUAL IMPORTS (Cybersecurity Manual Override)
+from src.models.user_model import UserDb
+from src.models.conversation_model import Conversation
+from src.models.message_model import Message
+
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
+# from myapp import mymodelclear
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
 
