@@ -25,12 +25,13 @@ export default function Header() {
           <Menu size={24} />
         </button>
         <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">
+          <Link to="/" className="flex items-center gap-3">
             <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
+              src="/src/assets/logo.png"
+              alt="Echo Logic"
               className="h-10"
             />
+            <span className="font-bold text-lg">Echo Logic AI</span>
           </Link>
         </h1>
       </header>

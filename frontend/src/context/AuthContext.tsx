@@ -10,6 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -19,23 +20,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<{ user: User | null; session: Session | null }>({ user: null, session: null });
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const result = await authClient.getSession();
-        if (result.data) {
-          setData(result.data);
-        } else {
-             setData({ user: null, session: null });
-        }
-      } catch (error) {
-        console.error("Failed to fetch session", error);
-      } finally {
-        setIsLoading(false);
+  const refreshSession = async () => {
+    try {
+      const result = await authClient.getSession();
+      if (result.data) {
+        setData(result.data);
+      } else {
+        setData({ user: null, session: null });
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch session", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchSession();
+  useEffect(() => {
+    refreshSession();
   }, []);
 
   const login = async (email: string) => {
@@ -53,6 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     login,
     logout,
+    refreshSession,
     isAuthenticated: !!data.user,
   };
 

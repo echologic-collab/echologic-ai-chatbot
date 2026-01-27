@@ -2,10 +2,12 @@ import { useRouter } from '@tanstack/react-router';
 import { Loader2, Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { authClient } from '../../lib/auth-client';
+import { useAuth } from '../../context/AuthContext';
 import { AuthLayout } from './AuthLayout';
 
 export const LoginForm = () => {
   const router = useRouter();
+  const { refreshSession } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +27,8 @@ export const LoginForm = () => {
       if (result.error) {
         setError(result.error.message || 'Failed to sign in');
       } else {
-        router.navigate({ to: '/' });
+        await refreshSession();
+        router.navigate({ to: '/chat' });
       }
     } catch (err: any) {
         console.error(err);

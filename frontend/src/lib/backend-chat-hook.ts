@@ -27,26 +27,31 @@ export const useBackendChat = () => {
     setError(null)
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const query = new URLSearchParams({ user_query: userMessage })
+      const backendBase = import.meta.env.VITE_BACKEND_URL
+      const url = backendBase
+        ? `${backendBase.replace(/\/$/, '')}/api/chat/?${query.toString()}`
+        : `/api/chat/?${query.toString()}`
+      const response = await fetch(url, {
         headers: {
-          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-        body: JSON.stringify({
-          message: userMessage,
-          history: messages.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-        }),
       })
 
+      const contentType = response.headers.get('content-type') || ''
+      const responseText = await response.text()
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        throw new Error(errorData.error || `HTTP ${response.status}`)
+        if (contentType.includes('application/json')) {
+          const errorData = JSON.parse(responseText || '{}')
+          throw new Error(errorData.error || `HTTP ${response.status}`)
+        }
+        throw new Error(responseText || `HTTP ${response.status}`)
       }
 
-      const data = await response.json()
+      const data =
+        contentType.includes('application/json') && responseText
+          ? JSON.parse(responseText)
+          : { response: responseText }
       
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),

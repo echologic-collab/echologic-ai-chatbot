@@ -61,7 +61,11 @@ function App() {
           <div className="mb-8 relative group">
              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
             <div className="relative bg-slate-950 rounded-full p-4 ring-1 ring-white/10">
-               <Sparkles className="w-16 h-16 text-violet-400" />
+               <img 
+                 src="/src/assets/logo.png" 
+                 alt="Echo Logic" 
+                 className="w-24 h-24 object-contain"
+               />
             </div>
           </div>
           
