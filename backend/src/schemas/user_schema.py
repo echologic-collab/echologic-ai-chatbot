@@ -15,6 +15,15 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
 
 
+class UserCreate(UserBase):
+    password: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
 class User(UserBase, ModelBaseInfo):
     model_config = ConfigDict(from_attributes=True)
 
