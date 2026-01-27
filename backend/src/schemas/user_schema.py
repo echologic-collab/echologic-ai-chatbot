@@ -10,6 +10,11 @@ class UserBase(BaseModel):
     email: EmailStr
 
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+
 class UserCreate(UserBase):
     password: str
 
@@ -17,11 +22,6 @@ class UserCreate(UserBase):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-
-
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    email: Optional[EmailStr] = None
 
 
 class User(UserBase, ModelBaseInfo):

@@ -1,16 +1,20 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
-  Zap,
-  Server,
   Route as RouteIcon,
+  Server,
   Shield,
-  Waves,
   Sparkles,
+  Waves,
+  Zap,
 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import logoUrl from '../assets/logo.png'
 
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
+  const auth = useAuth()
+  const navigate = useNavigate()
   const features = [
     {
       icon: <Sparkles className="w-12 h-12 text-violet-400" />,
@@ -58,7 +62,11 @@ function App() {
           <div className="mb-8 relative group">
              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
             <div className="relative bg-slate-950 rounded-full p-4 ring-1 ring-white/10">
-               <Sparkles className="w-16 h-16 text-violet-400" />
+               <img 
+                 src={logoUrl}
+                 alt="Echo Logic" 
+                 className="w-24 h-24 object-contain"
+               />
             </div>
           </div>
           
@@ -74,8 +82,18 @@ function App() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-full font-semibold transition-all shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] hover:shadow-[0_0_60px_-15px_rgba(139,92,246,0.5)] translation-transform hover:-translate-y-1">
-              Start Chatting
+            <button 
+              onClick={() => {
+                if (auth.isAuthenticated) {
+                  // Navigate to chat
+                  navigate({ to: '/chat' })
+                } else {
+                  navigate({ to: '/login' })
+                }
+              }}
+              className="px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-full font-semibold transition-all shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] hover:shadow-[0_0_60px_-15px_rgba(139,92,246,0.5)] translation-transform hover:-translate-y-1"
+            >
+              {auth.isAuthenticated ? 'Go to Chat' : 'Start Chatting'}
             </button>
             <button className="px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition-colors border border-slate-800">
               Learn More
