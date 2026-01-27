@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import logoUrl from '../assets/logo.png'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -27,7 +28,7 @@ export default function Header() {
         <h1 className="ml-4 text-xl font-semibold">
           <Link to="/" className="flex items-center gap-3">
             <img
-              src="/src/assets/logo.png"
+              src={logoUrl}
               alt="Echo Logic"
               className="h-10"
             />
