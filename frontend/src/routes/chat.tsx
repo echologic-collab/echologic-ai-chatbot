@@ -6,7 +6,7 @@ import { useBackendChat } from '../lib/backend-chat-hook'
 
 function ChatPage() {
   const { messages, sendMessage, isLoading, clearMessages } = useBackendChat()
-  const { user, logout } = useAuth()
+  const { user, logout, isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const navigate = useNavigate()
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -19,6 +19,12 @@ function ChatPage() {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate({ to: '/login' })
+    }
+  }, [isAuthLoading, isAuthenticated, navigate])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (input.trim() && !isLoading) {
@@ -30,6 +36,18 @@ function ChatPage() {
   const handleLogout = async () => {
     await logout()
     navigate({ to: '/' })
+  }
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+        Loading...
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null
   }
 
   return (
