@@ -61,7 +61,7 @@ class Config(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Neon Auth
-    JWKS_URL: str = "https://ep-sweet-tooth-ahzurbsj.neonauth.c-3.us-east-1.aws.neon.tech/neondb/auth/.well-known/jwks.json"
+    JWKS_URL: str
     AUTH_AUDIENCE: Optional[str] = None
 
     # find query
