@@ -3,7 +3,7 @@ from logging.config import dictConfig
 
 from src.core.config import config  # noqa: F401
 
-HANDLERS = ["default", "rotating_file"]
+HANDLERS = ["default"]
 
 
 def obfuscated(email: str, obfuscated_length: int) -> str:
@@ -79,34 +79,34 @@ def configure_logging() -> None:
                 #     "filters": ["correlation_id", "email_obfuscation"],
                 #     "source_token": config.LOGTAIL_API_KEY,
                 # },
-                "rotating_file": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "level": "DEBUG",
-                    "formatter": "file",
-                    "filename": "echo-logic-api.log",
-                    "maxBytes": 1024 * 1024 * 2,  # 2 megabytes
-                    "backupCount": 5,
-                    "encoding": "utf8",
-                    "filters": ["correlation_id", "email_obfuscation"],
-                },
+                # "rotating_file": {
+                #     "class": "logging.handlers.RotatingFileHandler",
+                #     "level": "DEBUG",
+                #     "formatter": "file",
+                #     "filename": "echo-logic-api.log",
+                #     "maxBytes": 1024 * 1024 * 2,  # 2 megabytes
+                #     "backupCount": 5,
+                #     "encoding": "utf8",
+                #     "filters": ["correlation_id", "email_obfuscation"],
+                # },
             },
             "loggers": {
-                "uvicorn": {"handlers": ["default", "rotating_file"], "level": "INFO"},
+                "uvicorn": {"handlers": ["default"], "level": "INFO"},
                 "src": {  # root.app.routers.post
                     "handlers": HANDLERS,
                     "level": "INFO",
                     "propagate": False,
                 },
                 "src.core": {
-                    "handlers": ["default", "rotating_file"],
+                    "handlers": ["default"],
                     "level": "WARNING",
                 },
                 "src.services": {
-                    "handlers": ["default", "rotating_file"],
+                    "handlers": ["default"],
                     "level": "WARNING",
                 },
                 "src.repository": {
-                    "handlers": ["default", "rotating_file"],
+                    "handlers": ["default"],
                     "level": "WARNING",
                 },
                 "sqlalchemy": {"handlers": ["default"], "level": "WARNING"},

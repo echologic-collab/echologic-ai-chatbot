@@ -8,10 +8,9 @@ export const Route = createFileRoute('/api/chat')({
     handlers: {
       POST: async ({ request }) => {
         try {
-          // Get the session to retrieve the token
-          const session = await authClient.getSession()
-          
-          if (!session.data?.session?.token) {
+          const token = authClient.getToken()
+
+          if (!token) {
             return new Response(
               JSON.stringify({ error: 'Unauthorized - No valid session' }),
               {
@@ -20,8 +19,6 @@ export const Route = createFileRoute('/api/chat')({
               }
             )
           }
-
-          const token = session.data.session.token
 
           // Forward the request to FastAPI backend
           const body = await request.json()

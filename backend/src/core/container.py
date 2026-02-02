@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 from src.core.config import get_config
 from src.core.database import Database
 from src.repository.user_repository import UserRepository
+from src.services.llm_service import LLMService
 from src.services.user_service import UserService
 
 
@@ -27,4 +28,9 @@ class Container(containers.DeclarativeContainer):
     user_service = providers.Factory(
         UserService,
         user_repository=user_repository,
+    )
+
+    llm_service = providers.Factory(
+        LLMService,
+        config=config,
     )

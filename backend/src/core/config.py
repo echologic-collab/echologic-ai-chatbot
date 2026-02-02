@@ -51,9 +51,9 @@ class Config(BaseSettings):
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
-    # OpenAI
-    OPENAI_API_KEY: Optional[str] = None
-    OPENAI_EMBEDDING_MODEL: Optional[str] = None
+    # LLM
+    MODEL_NAME: str = "google_genai:gemini-2.5-flash-lite"
+    GOOGLE_API_KEY: str
 
     # Security
     SECRET_KEY: str

@@ -8,6 +8,7 @@ from src.core.exceptions import NotFoundError, ValidationError
 from src.core.security import get_current_user
 from src.schemas.chat_schema import ChatRequest, ChatResponse
 from src.schemas.user_schema import TokenData
+from src.services.llm_service import LLMService
 from src.services.user_service import UserService
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -19,6 +20,7 @@ async def chat(
     chat_request: ChatRequest,
     current_user: Annotated[TokenData, Depends(get_current_user)],
     user_service: Annotated[UserService, Depends(Provide[Container.user_service])],
+    llm_service: Annotated[LLMService, Depends(Provide[Container.llm_service])],
 ):
     """
     Chat endpoint with authentication.
@@ -40,7 +42,7 @@ async def chat(
 
     # Simple echo response with user's name
     user_name = user.name if user.name else "User"
-    response_text = f"Hello {user_name}! You said: {chat_request.message}"
+    response_text = llm_service.generate_response(chat_request.message)
 
     return ChatResponse(
         user_email=current_user.email,

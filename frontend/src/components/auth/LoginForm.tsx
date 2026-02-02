@@ -1,42 +1,34 @@
 import { useRouter } from '@tanstack/react-router';
 import { Loader2, Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
-import { authClient } from '../../lib/auth-client';
-import { useAuth } from '../../context/AuthContext';
+import { authClient } from '../../lib/auth-client'
+import { useAuth } from '../../context/AuthContext'
 import { AuthLayout } from './AuthLayout';
 
 export const LoginForm = () => {
-  const router = useRouter();
-  const { refreshSession } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const router = useRouter()
+  const { refreshSession } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
 
     try {
-      const result = await authClient.signIn.email({
-        email,
-        password,
-      });
-
-      if (result.error) {
-        setError(result.error.message || 'Failed to sign in');
-      } else {
-        await refreshSession();
-        router.navigate({ to: '/chat' });
-      }
+      await authClient.login(email, password)
+      await refreshSession()
+      router.navigate({ to: '/chat' })
     } catch (err: any) {
-        console.error(err);
-      setError(err.message || 'An unexpected error occurred');
+      console.error(err)
+      setError(err.message || 'An unexpected error occurred')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <AuthLayout
@@ -118,5 +110,5 @@ export const LoginForm = () => {
         </button>
       </form>
     </AuthLayout>
-  );
-};
+  )
+}

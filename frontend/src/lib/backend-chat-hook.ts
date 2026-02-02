@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { authClient } from './auth-client'
 
 export interface Message {
   id: string
@@ -27,15 +28,19 @@ export const useBackendChat = () => {
     setError(null)
 
     try {
-      const query = new URLSearchParams({ user_query: userMessage })
       const backendBase = import.meta.env.VITE_BACKEND_URL
       const url = backendBase
-        ? `${backendBase.replace(/\/$/, '')}/api/chat/?${query.toString()}`
-        : `/api/chat/?${query.toString()}`
+        ? `${backendBase.replace(/\/$/, '')}/api/chat/`
+        : `/api/chat/`
+      const token = authClient.getToken()
       const response = await fetch(url, {
+        method: 'POST',
         headers: {
           Accept: 'application/json',
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        body: JSON.stringify({ message: userMessage }),
       })
 
       const contentType = response.headers.get('content-type') || ''

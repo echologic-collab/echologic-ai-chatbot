@@ -1,41 +1,36 @@
-import { useRouter } from '@tanstack/react-router';
-import { Loader2, Lock, Mail, User } from 'lucide-react';
-import { useState } from 'react';
-import { authClient } from '../../lib/auth-client';
-import { AuthLayout } from './AuthLayout';
+import { useRouter } from '@tanstack/react-router'
+import { Loader2, Lock, Mail, User } from 'lucide-react'
+import { useState } from 'react'
+import { authClient } from '../../lib/auth-client'
+import { AuthLayout } from './AuthLayout'
 
 export const SignupForm = () => {
-  const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const router = useRouter()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
 
     try {
-      const result = await authClient.signUp.email({
+      await authClient.register({
+        name: name || undefined,
         email,
         password,
-        name,
-      });
-
-      if (result.error) {
-        setError(result.error.message || 'Failed to sign up');
-      } else {
-        router.navigate({ to: '/' });
-      }
+      })
+      router.navigate({ to: '/login' })
     } catch (err: any) {
-        console.error(err);
-      setError(err.message || 'An unexpected error occurred');
+      console.error(err)
+      setError(err.message || 'An unexpected error occurred')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <AuthLayout
@@ -117,5 +112,5 @@ export const SignupForm = () => {
         </button>
       </form>
     </AuthLayout>
-  );
-};
+  )
+}
