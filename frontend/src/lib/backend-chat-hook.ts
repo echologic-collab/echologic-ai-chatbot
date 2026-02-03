@@ -9,6 +9,7 @@ export interface Message {
 }
 
 export const useBackendChat = () => {
+  const [conversationId, setConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,6 +34,12 @@ export const useBackendChat = () => {
         ? `${backendBase.replace(/\/$/, '')}/api/chat/`
         : `/api/chat/`
       const token = authClient.getToken()
+      
+      const payload: any = { message: userMessage }
+      if (conversationId) {
+        payload.conversation_id = conversationId
+      }
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -40,7 +47,7 @@ export const useBackendChat = () => {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify(payload),
       })
 
       const contentType = response.headers.get('content-type') || ''
@@ -57,6 +64,14 @@ export const useBackendChat = () => {
         contentType.includes('application/json') && responseText
           ? JSON.parse(responseText)
           : { response: responseText }
+      
+      console.log('DEBUG: Backend response data:', data)
+      if (data.conversation_id) {
+        console.log('DEBUG: Setting conversationId to:', data.conversation_id)
+        setConversationId(data.conversation_id)
+      } else {
+        console.warn('DEBUG: No conversation_id in response')
+      }
       
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),

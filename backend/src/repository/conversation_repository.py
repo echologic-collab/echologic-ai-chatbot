@@ -1,7 +1,10 @@
 from typing import Any, Callable
 
+from sqlmodel import select
+
 from src.models.conversation_model import ConversationDb
 from src.repository.base_repository import BaseRepository
+from src.util.query_builder import dict_to_sqlalchemy_filter_options
 
 
 class ConversationRepository(BaseRepository):
@@ -10,13 +13,13 @@ class ConversationRepository(BaseRepository):
     def __init__(self, session_factory: Callable[..., Any]):
         super().__init__(session_factory, ConversationDb)
 
-    def get_existing_conversation(
+    async def get_existing_conversation(
         self, conversation_uuid: str, user_id: int
     ) -> ConversationDb | None:
-        search_result = self.read_by_options(
-            schema=ConversationDb(uuid=conversation_uuid, user_id=user_id)
-        )
-        if search_result["founds"]:
-            conversation = search_result["founds"][0]
-            return conversation
-        return None
+        async with self.session_factory() as session:
+            filter_options = dict_to_sqlalchemy_filter_options(
+                self.model, {"uuid": conversation_uuid, "user_id": user_id}
+            )
+            query = select(self.model).where(filter_options)
+            result = await session.execute(query)
+            return result.scalars().first()

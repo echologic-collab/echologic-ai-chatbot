@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from src.core.security import get_password_hash, verify_password
 from src.models.user_model import UserDb
@@ -21,8 +21,8 @@ class UserService(BaseService):
         user = UserDb(
             email=user_create.email,
             hashed_password=hashed_password,
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
             name=user_create.name,
         )
         return await self.user_repository.create(user)
