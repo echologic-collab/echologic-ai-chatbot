@@ -216,7 +216,11 @@ propcache==0.4.1
     #   aiohttp
     #   yarl
 psycopg==3.3.2
-    # via langgraph-checkpoint-postgres
+    # via
+    #   backend (pyproject.toml)
+    #   langgraph-checkpoint-postgres
+psycopg-binary==3.3.2
+    # via psycopg
 psycopg-pool==3.3.0
     # via langgraph-checkpoint-postgres
 psycopg2-binary==2.9.11
