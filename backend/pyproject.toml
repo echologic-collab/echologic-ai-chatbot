@@ -25,7 +25,6 @@ dependencies = [
     "langchain-google-genai>=4.2.0",
     "langgraph-checkpoint-postgres>=3.0.4",
     "psycopg[binary]>=3.2.1",
-    "psycopg2-binary>=2.9.11",
 ]
 
 [tool.pyright]
