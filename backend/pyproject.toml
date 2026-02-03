@@ -23,6 +23,7 @@ dependencies = [
     "langchain[google-genai]>=1.2.7",
     "langchain-community>=0.3.31",
     "langchain-google-genai>=4.2.0",
+    "langgraph-checkpoint-postgres>=3.0.4",
 ]
 
 [tool.pyright]
