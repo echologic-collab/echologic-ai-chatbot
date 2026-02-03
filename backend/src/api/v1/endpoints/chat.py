@@ -42,7 +42,8 @@ async def chat(
 
     # Simple echo response with user's name
     user_name = user.name if user.name else "User"
-    response_text = llm_service.generate_response(chat_request.message)
+    thread_id = f"{user.id}-{chat_request.conversation_id}"
+    response_text = llm_service.generate_response(chat_request.message, thread_id)
 
     return ChatResponse(
         user_email=current_user.email,
