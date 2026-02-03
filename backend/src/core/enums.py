@@ -11,3 +11,8 @@ class Role(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
     SYSTEM = "system"
+
+
+class ConversationStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
