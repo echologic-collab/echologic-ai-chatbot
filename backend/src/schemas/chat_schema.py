@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class ChatRequest(BaseModel):
     message: str
+    conversation_id: Optional[str] = "default"
 
 
 class ChatResponse(BaseModel):
@@ -12,3 +13,4 @@ class ChatResponse(BaseModel):
     user_name: Optional[str] = None
     message: str
     response: str
+    conversation_id: str
