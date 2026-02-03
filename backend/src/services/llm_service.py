@@ -18,7 +18,9 @@ class LLMService:
         self.model = init_chat_model(config.MODEL_NAME)
         os.environ["GOOGLE_API_KEY"] = config.GOOGLE_API_KEY
         with PostgresSaver.from_conn_string(
-            conn_string=config.SQLALCHEMY_DATABASE_URI
+            conn_string=config.SQLALCHEMY_DATABASE_URI.replace(
+                "postgresql+asyncpg://", "postgresql://"
+            )
         ) as checkpointer:
             checkpointer.setup()
 
@@ -46,7 +48,9 @@ class LLMService:
     def reset_thread(self, thread_id: str) -> None:
         try:
             with PostgresSaver.from_conn_string(
-                conn_string=self.config.SQLALCHEMY_DATABASE_URI
+                conn_string=self.config.SQLALCHEMY_DATABASE_URI.replace(
+                    "postgresql+asyncpg://", "postgresql://"
+                )
             ) as checkpointer:
                 checkpointer.delete_thread(thread_id)
         except Exception:
