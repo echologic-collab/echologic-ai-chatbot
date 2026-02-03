@@ -2,12 +2,14 @@ from typing import Annotated
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
+from starlette.concurrency import run_in_threadpool
 
 from src.core.container import Container
 from src.core.enums import ConversationStatus, Role
 from src.core.exceptions import NotFoundError, ValidationError
 from src.core.security import get_current_user
 from src.models.conversation_model import ConversationDb
+from src.models.message_model import MessageDb
 from src.repository.conversation_repository import ConversationRepository
 from src.repository.message_repository import MessageRepository
 from src.schemas.chat_schema import ChatRequest, ChatResponse
@@ -59,25 +61,33 @@ async def chat(
         )
 
     if not conversation:
-        conversation: ConversationDb = await conversation_repository.create(
-            user_id=user.id,
-            title=chat_request.message[:12] + "...",  # Simple title generation
-            status=ConversationStatus.ACTIVE,
+        conversation = await conversation_repository.create(
+            schema=ConversationDb(
+                user_id=user.id,
+                title=chat_request.message[:12] + "...",  # Simple title generation
+                status=ConversationStatus.ACTIVE,
+            )
         )
 
     await message_repository.create(
-        conversation_id=conversation.id,
-        content=chat_request.message,
-        role=Role.USER,
+        schema=MessageDb(
+            conversation_id=conversation.id,
+            content=chat_request.message,
+            role=Role.USER,
+        )
     )
 
     thread_id = conversation.uuid
-    response_text = llm_service.generate_response(chat_request.message, thread_id)
+    response_text = await run_in_threadpool(
+        llm_service.generate_response, chat_request.message, thread_id
+    )
 
     await message_repository.create(
-        conversation_id=conversation.id,
-        content=response_text,
-        role=Role.ASSISTANT,
+        schema=MessageDb(
+            conversation_id=conversation.id,
+            content=response_text,
+            role=Role.ASSISTANT,
+        )
     )
 
     user_name = user.name if user.name else "User"
