@@ -144,7 +144,10 @@ langgraph==1.0.7
 langgraph-checkpoint==4.0.0
     # via
     #   langgraph
+    #   langgraph-checkpoint-postgres
     #   langgraph-prebuilt
+langgraph-checkpoint-postgres==3.0.4
+    # via backend (pyproject.toml)
 langgraph-prebuilt==1.0.7
     # via langgraph
 langgraph-sdk==0.3.3
@@ -200,6 +203,7 @@ opentelemetry-util-http==0.60b1
     #   opentelemetry-instrumentation-fastapi
 orjson==3.11.5
     # via
+    #   langgraph-checkpoint-postgres
     #   langgraph-sdk
     #   langsmith
 ormsgpack==1.12.2
@@ -217,6 +221,12 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
+psycopg==3.3.2
+    # via langgraph-checkpoint-postgres
+psycopg-pool==3.3.0
+    # via langgraph-checkpoint-postgres
+psycopg2-binary==2.9.11
+    # via backend (pyproject.toml)
 pyasn1==0.6.2
     # via
     #   pyasn1-modules
@@ -337,6 +347,8 @@ typing-extensions==4.15.0
     #   multidict
     #   opentelemetry-api
     #   opentelemetry-semantic-conventions
+    #   psycopg
+    #   psycopg-pool
     #   pydantic
     #   pydantic-core
     #   pydantic-extra-types
