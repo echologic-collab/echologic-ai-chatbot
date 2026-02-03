@@ -17,14 +17,16 @@ class LLMService:
         self.config = config
         self.model = init_chat_model(config.MODEL_NAME)
         os.environ["GOOGLE_API_KEY"] = config.GOOGLE_API_KEY
+
+    def generate_response(self, message: str, thread_id: str) -> str:
         with PostgresSaver.from_conn_string(
-            conn_string=config.SQLALCHEMY_DATABASE_URI.replace(
+            conn_string=self.config.SQLALCHEMY_DATABASE_URI.replace(
                 "postgresql+asyncpg://", "postgresql://"
             )
         ) as checkpointer:
             checkpointer.setup()
 
-            self.agent = create_agent(
+            agent = create_agent(
                 model=self.model,
                 tools=[],
                 checkpointer=checkpointer,
@@ -32,18 +34,17 @@ class LLMService:
                 middleware=[
                     SummarizationMiddleware(
                         model=self.model,
-                        trigger=("tokens", 4000),
+                        trigger=("tokens", 2000),
                         keep=("messages", 10),
                     ),
                 ],
             )
 
-    def generate_response(self, message: str, thread_id: str) -> str:
-        response = self.agent.invoke(
-            {"messages": [{"role": "user", "content": message}]},
-            {"configurable": {"thread_id": thread_id}},
-        )
-        return response["messages"][-1].content
+            response = agent.invoke(
+                {"messages": [{"role": "user", "content": message}]},
+                {"configurable": {"thread_id": thread_id}},
+            )
+            return response["messages"][-1].content
 
     def reset_thread(self, thread_id: str) -> None:
         try:
