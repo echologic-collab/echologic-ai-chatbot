@@ -1,3 +1,4 @@
+import uuid
 from enum import Enum
 
 from sqlalchemy.orm import aliased
@@ -28,16 +29,27 @@ def dict_to_sqlalchemy_filter_options(model_class, search_option_dict):
             sql_alchemy_filter_options.append(attr == option_from_dict.value)
 
         elif type(option_from_dict) in [str]:
-            if "," in option_from_dict:
+            # Check if matching exact UUID
+            is_uuid = False
+            try:
+                uuid.UUID(str(option_from_dict))
+                is_uuid = True
+            except ValueError:
+                pass
+
+            if "," in option_from_dict and not is_uuid:
                 parts = [
                     part.strip() for part in option_from_dict.split(",") if part.strip()
                 ]
                 like_conditions = [attr.like(f"%{part}%") for part in parts]
                 sql_alchemy_filter_options.append(or_(*like_conditions))
             else:
-                sql_alchemy_filter_options.append(
-                    attr.like(f"%{option_from_dict.strip()}%")
-                )
+                if is_uuid or key == "uuid":
+                    sql_alchemy_filter_options.append(attr == option_from_dict.strip())
+                else:
+                    sql_alchemy_filter_options.append(
+                        attr.like(f"%{option_from_dict.strip()}%")
+                    )
         elif type(option_from_dict) in [bool]:
             sql_alchemy_filter_options.append(attr == option_from_dict)
 
