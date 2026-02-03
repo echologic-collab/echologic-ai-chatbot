@@ -6,12 +6,9 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlmodel import SQLModel
 
-# Import all models so they are registered in SQLModel.metadata
 from src import models  # noqa: F401
 from src.core.config import config as app_config
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
 # Interpret the config file for Python logging.
@@ -19,23 +16,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# migrations/env.py
-from sqlmodel import SQLModel
-# FORCED MANUAL IMPORTS (Cybersecurity Manual Override)
-from src.models.user_model import UserDb
-from src.models.conversation_model import Conversation
-from src.models.message_model import Message
-
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodelclear
-# target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:
