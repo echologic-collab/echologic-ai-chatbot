@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship
 from src.models.base_model import BaseModel
 
 if TYPE_CHECKING:
-    from src.models.conversation_model import Conversation
+    from src.models.conversation_model import ConversationDb
 
 
 class UserDb(BaseModel, table=True):
@@ -14,4 +14,4 @@ class UserDb(BaseModel, table=True):
     email: Optional[str] = Field(default=None, unique=True, index=True)
     hashed_password: str = Field(nullable=False)
 
-    conversations: List["Conversation"] = Relationship(back_populates="user")
+    conversations: List["ConversationDb"] = Relationship(back_populates="user")
