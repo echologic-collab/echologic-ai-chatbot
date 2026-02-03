@@ -4,8 +4,12 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.core.container import Container
+from src.core.enums import ConversationStatus, Role
 from src.core.exceptions import NotFoundError, ValidationError
 from src.core.security import get_current_user
+from src.models.conversation_model import ConversationDb
+from src.repository.conversation_repository import ConversationRepository
+from src.repository.message_repository import MessageRepository
 from src.schemas.chat_schema import ChatRequest, ChatResponse
 from src.schemas.user_schema import TokenData
 from src.services.llm_service import LLMService
@@ -21,6 +25,12 @@ async def chat(
     current_user: Annotated[TokenData, Depends(get_current_user)],
     user_service: Annotated[UserService, Depends(Provide[Container.user_service])],
     llm_service: Annotated[LLMService, Depends(Provide[Container.llm_service])],
+    conversation_repository: Annotated[
+        ConversationRepository, Depends(Provide[Container.conversation_repository])
+    ],
+    message_repository: Annotated[
+        MessageRepository, Depends(Provide[Container.message_repository])
+    ],
 ):
     """
     Chat endpoint with authentication.
@@ -40,16 +50,44 @@ async def chat(
     if not user:
         raise NotFoundError(detail=f"User {current_user.email} not found")
 
-    # Simple echo response with user's name
-    user_name = user.name if user.name else "User"
-    thread_id = f"{user.id}-{chat_request.conversation_id}"
+    conversation_uuid = chat_request.conversation_id
+    conversation = None
+
+    if conversation_uuid and conversation_uuid != "default":
+        conversation = await conversation_repository.get_existing_conversation(
+            conversation_uuid=conversation_uuid, user_id=user.id
+        )
+
+    if not conversation:
+        conversation: ConversationDb = await conversation_repository.create(
+            user_id=user.id,
+            title=chat_request.message[:12] + "...",  # Simple title generation
+            status=ConversationStatus.ACTIVE,
+        )
+
+    await message_repository.create(
+        conversation_id=conversation.id,
+        content=chat_request.message,
+        role=Role.USER,
+    )
+
+    thread_id = conversation.uuid
     response_text = llm_service.generate_response(chat_request.message, thread_id)
+
+    await message_repository.create(
+        conversation_id=conversation.id,
+        content=response_text,
+        role=Role.ASSISTANT,
+    )
+
+    user_name = user.name if user.name else "User"
 
     return ChatResponse(
         user_email=current_user.email,
         user_name=user_name,
         message=chat_request.message,
         response=response_text,
+        conversation_id=conversation.uuid,
     )
 
 
@@ -59,6 +97,9 @@ async def reset_thread(
     current_user: Annotated[TokenData, Depends(get_current_user)],
     user_service: Annotated[UserService, Depends(Provide[Container.user_service])],
     llm_service: Annotated[LLMService, Depends(Provide[Container.llm_service])],
+    conversation_repository: Annotated[
+        ConversationRepository, Depends(Provide[Container.conversation_repository])
+    ],
     conversation_id: str = "default",
 ):
     """
@@ -69,5 +110,17 @@ async def reset_thread(
     if not user:
         raise NotFoundError(detail=f"User {current_user.email} not found")
 
-    thread_id = f"{user.id}-{conversation_id}"
-    llm_service.reset_thread(thread_id)
+    llm_service.reset_thread(conversation_id)
+
+    await conversation_repository.update(
+        conversation_id=conversation_id,
+        status=ConversationStatus.INACTIVE,
+    )
+
+    return ChatResponse(
+        user_email=current_user.email,
+        user_name=user.name or "User",
+        message="System",
+        response="Conversation memory reset.",
+        conversation_id=conversation_id,
+    )

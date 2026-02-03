@@ -13,3 +13,4 @@ class ChatResponse(BaseModel):
     user_name: Optional[str] = None
     message: str
     response: str
+    conversation_id: str

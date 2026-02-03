@@ -2,6 +2,8 @@ from dependency_injector import containers, providers
 
 from src.core.config import get_config
 from src.core.database import Database
+from src.repository.conversation_repository import ConversationRepository
+from src.repository.message_repository import MessageRepository
 from src.repository.user_repository import UserRepository
 from src.services.llm_service import LLMService
 from src.services.user_service import UserService
@@ -33,4 +35,14 @@ class Container(containers.DeclarativeContainer):
     llm_service = providers.Factory(
         LLMService,
         config=config,
+    )
+
+    conversation_repository = providers.Factory(
+        ConversationRepository,
+        session_factory=database.provided.session,
+    )
+
+    message_repository = providers.Factory(
+        MessageRepository,
+        session_factory=database.provided.session,
     )
