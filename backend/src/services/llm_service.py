@@ -1,3 +1,4 @@
+import logging
 import os
 
 from langchain.agents import create_agent
@@ -6,6 +7,9 @@ from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.postgres import PostgresSaver
 
 from src.core.config import Config
+from src.core.exceptions import NotFoundError
+
+logger = logging.getLogger(__name__)
 
 
 class LLMService:
@@ -38,3 +42,13 @@ class LLMService:
             {"configurable": {"thread_id": thread_id}},
         )
         return response["messages"][-1].content
+
+    def reset_thread(self, thread_id: str) -> None:
+        try:
+            with PostgresSaver.from_conn_string(
+                conn_string=self.config.SQLALCHEMY_DATABASE_URI
+            ) as checkpointer:
+                checkpointer.delete_thread(thread_id)
+        except Exception:
+            logger.error(f"Failed to reset thread: {thread_id}")
+            raise NotFoundError(detail=f"Thread {thread_id} not found")

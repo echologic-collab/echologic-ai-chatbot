@@ -51,3 +51,23 @@ async def chat(
         message=chat_request.message,
         response=response_text,
     )
+
+
+@router.post("/reset", response_model=ChatResponse)
+@inject
+async def reset_thread(
+    current_user: Annotated[TokenData, Depends(get_current_user)],
+    user_service: Annotated[UserService, Depends(Provide[Container.user_service])],
+    llm_service: Annotated[LLMService, Depends(Provide[Container.llm_service])],
+    conversation_id: str = "default",
+):
+    """
+    Reset conversation thread for the user.
+    """
+    user = await user_service.get_by_email(current_user.email)
+
+    if not user:
+        raise NotFoundError(detail=f"User {current_user.email} not found")
+
+    thread_id = f"{user.id}-{conversation_id}"
+    llm_service.reset_thread(thread_id)
